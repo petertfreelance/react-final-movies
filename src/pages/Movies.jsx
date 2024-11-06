@@ -23,7 +23,7 @@ const Movies = () => {
     async function renderMovies(filter) {
 
         setLoading(true);
-        setMovies([]);
+        
         const options = {
             method: 'GET',
             headers: {
@@ -46,13 +46,15 @@ const Movies = () => {
             movieData = await axios.get('https://api.themoviedb.org/3/account/719ef349785fecd706a9b04f07619433/favorite/movies', options)
         }
 
-
+        if(movies.length === 0 && movieData ) {
+            setMovies(movieData);
+        }
         
         setMovies(movieData.data.results);
 
-        console.log(searchId);
-        if(searchId) {
-            updateMovieLists(searchId);
+    
+        if(filter) {
+            updateMovieLists(filter);
             
         } 
 
@@ -85,7 +87,7 @@ const Movies = () => {
             
             sorted_array = movies;
             setMovies(['placeholder']);
-            sorted_array.sort((a,b) => {return b.release_date.localeCompare(a.release_date)})
+            sorted_array.sort((a,b) => {return a.release_date.localeCompare(b.release_date)})
             console.log('here:')
             console.log(sorted_array)
             setMovies(sorted_array);
@@ -93,7 +95,7 @@ const Movies = () => {
         } else if (filter == 'RELASE_DATE_DSC') {
             sorted_array = movies;
             setMovies([]);
-            sorted_array.sort((a,b) => {return a.release_date.localeCompare(b.release_date)})
+            sorted_array.sort((a,b) => {return b.release_date.localeCompare(a.release_date)})
             setMovies(sorted_array);
             
         } else if (filter == 'ALPHABETICAL') {
@@ -107,27 +109,32 @@ const Movies = () => {
     
     
     useEffect(() => {
+        console.log(id.filter)
         if (id.filter) {
-            setSearchId(id.filter.slice(1, id.length))
+            renderMovies(id.filter.slice(1, id.length))
+        } else {
+            renderMovies()
         }
         
-        renderMovies();
-
-        if (!searchId) {
-            renderMovies();
-        }
 
     }, []);
 
     useEffect(() => {
+        console.log(id.filter)
         if (id.filter) {
-            setSearchId(id.filter.slice(1, id.length))
+            renderMovies(id.filter.slice(1, id.length))
+        } else {
+            renderMovies()
         }
+        
+
+    }, [id]);
+
+    useEffect(() => {
+        
         console.log("Updated movies:", movies);
     }, [movies]);
 
-
-    
     
 
     return (
@@ -136,7 +143,7 @@ const Movies = () => {
             <div class="row movie-section">
       <div class="filter-container">
         <span>Sort By: </span>
-        <select name="" id="filter" onChange={(e) => {setSearchId(e.target.value);renderMovies(e.target.value)}}>
+        <select name="" defaultValue="" id="filter" onChange={(e) => {renderMovies(e.target.value)}}>
           <option value="" selected>Sort</option>
           <option value="RELASE_DATE_ASC">Oldest Release</option>
           <option value="RELASE_DATE_DSC">Latest Release</option>
