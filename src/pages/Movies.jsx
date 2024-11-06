@@ -85,7 +85,7 @@ const Movies = () => {
             
             sorted_array = movies;
             setMovies(['placeholder']);
-            sorted_array.sort((a,b) => {return a.release_date.localeCompare(b.release_date)})
+            sorted_array.sort((a,b) => {return b.release_date.localeCompare(a.release_date)})
             console.log('here:')
             console.log(sorted_array)
             setMovies(sorted_array);
@@ -93,7 +93,7 @@ const Movies = () => {
         } else if (filter == 'RELASE_DATE_DSC') {
             sorted_array = movies;
             setMovies([]);
-            sorted_array.sort((a,b) => {return b.release_date.localeCompare(a.release_date)})
+            sorted_array.sort((a,b) => {return a.release_date.localeCompare(b.release_date)})
             setMovies(sorted_array);
             
         } else if (filter == 'ALPHABETICAL') {
@@ -136,7 +136,7 @@ const Movies = () => {
             <div class="row movie-section">
       <div class="filter-container">
         <span>Sort By: </span>
-        <select name="" id="filter" onChange={(e) => renderMovies(e.target.value)}>
+        <select name="" id="filter" onChange={(e) => {setSearchId(e.target.value);renderMovies(e.target.value)}}>
           <option value="" selected>Sort</option>
           <option value="RELASE_DATE_ASC">Oldest Release</option>
           <option value="RELASE_DATE_DSC">Latest Release</option>
