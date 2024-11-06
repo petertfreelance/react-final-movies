@@ -70,7 +70,12 @@ const Header = () => {
                     } 
                     onKeyPress={(event) => {
                       if(event.key === 'Enter') {
-                        navigate(`/movies/:${searchId}`);
+                        if(searchId) {
+                          navigate(`/movies/:${searchId}`);
+                        } else {
+                          navigate('/movies')
+                        }
+                        
                       }
                     }}
                     />

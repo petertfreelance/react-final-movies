@@ -3,21 +3,27 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Movie from "../components/Movie";
 import axios from "axios";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 
 const Movies = () => {
 
+    let navigate = useNavigate()
     const id = useParams();
     const [movies, setMovies] = useState([]);
     const [loading, setLoading] = useState();
+
+    let movieData ='';
     let [searchId, setSearchId] = useState()
+
+
+    
 
     
 
     async function renderMovies(filter) {
 
-
         setLoading(true);
+        setMovies([]);
         const options = {
             method: 'GET',
             headers: {
@@ -34,61 +40,67 @@ const Movies = () => {
         
     
         const moviewrapper = document.getElementById('shop');
-        const movieData = await axios.get('https://api.themoviedb.org/3/account/719ef349785fecd706a9b04f07619433/favorite/movies', options)
+        
+        
+        if(!movieData) {
+            movieData = await axios.get('https://api.themoviedb.org/3/account/719ef349785fecd706a9b04f07619433/favorite/movies', options)
+        }
 
 
-        console.log(movieData.data.results);
+        
         setMovies(movieData.data.results);
 
-        console.log("here:")
-        console.log(movies);
-
-        if(searchId && movies) {
+        console.log(searchId);
+        if(searchId) {
             updateMovieLists(searchId);
             
-        }
+        } 
 
-        if(movies) {
-            setLoading(false);
-        }
-
+        setLoading(false);
         
     }
 
     function updateMovieLists(filter) {
 
-        // console.log("here:")
-        // console.log(movies)
-        // console.log(filter)
-        const filtered_array = [];
+        let filtered_array = [];
+        let sorted_array = [];
 
-        if(filter != 'RELASE_DATE_ASC' && filter != 'RELASE_DATE_DSC' && filter != 'ALPHABETICAL') {
+        setLoading(true);
+
+        if(filter && filter != 'RELASE_DATE_ASC' && filter != 'RELASE_DATE_DSC' && filter != 'ALPHABETICAL') {
             
             movies.forEach(element => {
 
                 if(element.title.toLowerCase().includes(filter)) {
                     
-                    filtered_array.push = element;
+                    filtered_array.push(element);
                 }
             });
-            // console.log(filtered_array)
-    
-            setMovies({filtered_array});
-        } else if (filter == 'RELASE_DATE_ASC') {
-            
-            filtered_array = movies;
-            filtered_array.sort((a,b) => {return a.release_date.localeCompare(b.release_date)})
+
+            console.log("filtered:")
+            console.log(filtered_array)
             setMovies(filtered_array);
 
+        } else if (filter == 'RELASE_DATE_ASC') {
+            
+            sorted_array = movies;
+            setMovies(['placeholder']);
+            sorted_array.sort((a,b) => {return a.release_date.localeCompare(b.release_date)})
+            console.log('here:')
+            console.log(sorted_array)
+            setMovies(sorted_array);
+
         } else if (filter == 'RELASE_DATE_DSC') {
-            filtered_array = movies;
-            filtered_array.sort((a,b) => {return b.release_date.localeCompare(a.release_date)})
-            setMovies(filtered_array);
+            sorted_array = movies;
+            setMovies([]);
+            sorted_array.sort((a,b) => {return b.release_date.localeCompare(a.release_date)})
+            setMovies(sorted_array);
             
         } else if (filter == 'ALPHABETICAL') {
-            filtered_array = movies;
-            filtered_array.sort((a,b) => {return a.title.localeCompare(b.title)})
-            setMovies(filtered_array);
+            sorted_array = movies;
+            setMovies([]);
+            sorted_array.sort((a,b) => {return a.title.localeCompare(b.title)})
+            setMovies(sorted_array);
            
         }
     } 
@@ -100,7 +112,21 @@ const Movies = () => {
         }
         
         renderMovies();
+
+        if (!searchId) {
+            renderMovies();
+        }
+
     }, []);
+
+    useEffect(() => {
+        if (id.filter) {
+            setSearchId(id.filter.slice(1, id.length))
+        }
+        console.log("Updated movies:", movies);
+    }, [movies]);
+
+
     
     
 
@@ -110,23 +136,19 @@ const Movies = () => {
             <div class="row movie-section">
       <div class="filter-container">
         <span>Sort By: </span>
-        <select name="" id="filter" onchange="renderMovies(event)">
+        <select name="" id="filter" onChange={(e) => renderMovies(e.target.value)}>
           <option value="" selected>Sort</option>
           <option value="RELASE_DATE_ASC">Oldest Release</option>
           <option value="RELASE_DATE_DSC">Latest Release</option>
           <option value="ALPHABETICAL">A - Z</option>
         </select>
       </div>
-      <div class={"shop-container " + loading ? "movies__loading":""} id="shop">
+      <div class={loading ? "movies__loading":"" + " shop-container "} id="shop">
+      <i className="fas fa-spinner movies__loading-spinner"></i>
         
-        {
-            loading ? <i className="fas fa-spinner movies__loading-spinner"></i>
-            : () => {(movies.map((movie) => {
-                console.log(movie);
-                return <Movie movie={movie} key={movie.id} />;
-            }))}
-            
-        }
+      {movies && !loading && movies.map((movie) => {
+                  return <Movie movie={movie} key={movie.id} />;
+                })}
         
     </div>
     </div>
