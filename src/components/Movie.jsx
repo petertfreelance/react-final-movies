@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Movie = ({ movie}) => {
 
     const imageBaseUrl = 'https://image.tmdb.org/t/p/w600_and_h900_bestv2'
 
-    
+    let navigate = useNavigate()
 
-    function check() {
-        console.log(movie);
-    }
+
 
     function showMore(id) {
         let movie = document.getElementById(id);
@@ -32,16 +31,16 @@ const Movie = ({ movie}) => {
     return (
         <div id={movie.id} class="movie">
                     <figure class="movie__img--wrapper">
-                        <img class="movie__img" src={imageBaseUrl + movie.poster_path} alt="" />
+                        <Link to={"/movies/movieinfo/:"+ movie.id} ><img class="movie__img" src={imageBaseUrl + movie.poster_path} alt="" /></Link>
                     </figure>
                     <div class="movie__title">
-                        <span>{movie.title}</span>
+                        <Link to={"/movies/movieinfo/:"+ movie.id} ><span>{movie.title}</span></Link>
                     </div>
                     <div className="movie__date">
                         {movie.release_date}
                     </div>
                     <div class="movie__description">
-                    <p class="overview">{movie.overview.substring(0, 50)} <span className="more">{movie.overview.substring(51, movie.overview.length)}</span><a href="javascript:void(0)" onClick={() => showMore(movie.id)} class="show-more">more...</a></p>
+                    <p class="overview">{movie.overview.substring(0, 50)}<Link to={"/movies/movieinfo/:"+ movie.id} class="show-more">more...</Link></p>
                     </div>
                 </div>
     )

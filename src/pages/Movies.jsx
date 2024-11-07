@@ -130,10 +130,6 @@ const Movies = () => {
 
     }, [id]);
 
-    useEffect(() => {
-        
-        console.log("Updated movies:", movies);
-    }, [movies]);
 
     
 
